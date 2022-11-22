@@ -7,12 +7,12 @@ class Array
             prc.call(self[i])
             i += 1  
         end
-        self
+        return self
     end
 
     def my_select(&prc)
         new_arr = []
-        self.my_each(&prc).each do |ele|
+        self.my_each do |ele|
             new_arr << ele if prc.call(ele)
         end
         new_arr
@@ -20,10 +20,8 @@ class Array
 
     def my_reject(&prc)
         new_arr = []
-        i = 0
-        while i < self.length
-            new_arr << self[i] if !prc.call(self[i])
-            i += 1
+        self.each do |ele|
+            new_arr << ele if !prc.call(ele)
         end
         new_arr
     end
@@ -47,76 +45,60 @@ class Array
     end
 
     def my_flatten
-        return self if !self.is_a?(Array)
-        result = []
+        new_arr = []
         self.each do |ele|
             if !ele.is_a?(Array)
-                result << ele
+                new_arr << ele
             else
-                result += ele.my_flatten
+                new_arr += ele.my_flatten
             end
         end
-        result
+        new_arr 
     end
+
+    def my_zip(*arrays) ######
+        new_arr = []
+        self.length.times do |i|
+            sub_arr = [self[i]]
+
+            arrays.each do |array|
+                sub_arr << array[i]
+            end
+            new_arr << sub_arr
+        end
+        new_arr
+    end
+
+    def my_rotate(num = 1)
+        new_arr = []
+        self.each_with_index do |ele, i|
+            new_idx = (num + i) % self.length
+            new_arr << self[new_idx]
+        end
+        new_arr
+    end
+
+    def my_join(separator = "")
+        join_str = ""
+        self.each_with_index do |ele, i|
+            join_str += ele 
+            join_str += separator if i != self.length - 1
+        end
+        join_str
+    end
+
+    def my_reverse
+        new_arr = []
+        i = self.length - 1
+        while i >= 0 
+            new_arr << self[i]
+            i -= 1
+        end
+        new_arr
+    end
+    
 end
 
-    #     # debugger
-    #     return [self] if !self.is_a?(Array) 
-    #     return self if self.empty?
-    #     self[0].my_flatten + self[1..-1].my_flatten
-        
-        
-    # end
+p [ "a", "b", "c" ].my_reverse   #=> ["c", "b", "a"]
+p [ 1 ].my_reverse               #=> [1]
 
-    # def flatten(data)
-    #     return [data] unless data.is_a? Array
-    #     return data if data.empty?
-    #     flatten(data[0]) + flatten(data[1..-1])
-    # end
-
-#     def flatten(data)
-#         return [data] if !data.is_a?(Array)
-#         result = []
-#         data.each do |el|
-#           if el.is_a?(Array)
-#             result += flatten(el)
-#           else
-#             result << el
-#           end
-#         end
-#         result
-#     end
-# end
-# p ['20'].my_flatten
-
-
-# a = [1, 2, 3]
-# a.my_select { |num| num > 1 } # => [2, 3]
-# a.my_select { |num| num == 4 } # => []
-
-# # calls my_each twice on the array, printing all the numbers twice.
-# return_value = [1, 2, 3].my_each do |num|
-#     puts num
-#    end.my_each do |num|
-#     puts num
-#    end
-#    # => 1
-#        2
-#        3
-#        1
-#        2
-#        3
-   
-#    p return_value  # => [1, 2, 3]
-
-# a = [1, 2, 3]
-# p a.my_reject { |num| num > 1 } # => [1]
-# p a.my_reject { |num| num == 4 } # => [1, 2, 3]
-
-# a = [1, 2, 3]
-# p a.my_any? { |num| num > 1 } # => true
-# p a.my_any? { |num| num == 4 } # => false
-# p a.my_all? { |num| num > 1 } # => false
-# p a.my_all? { |num| num < 4 } # => true
-
-p [1, 2, 3, [4, [5, 6]], [[[7]], 8]].my_flatten # => [1, 2, 3, 4, 5, 6, 7, 8]
